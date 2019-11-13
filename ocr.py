@@ -6,6 +6,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import confusion_matrix
 from sklearn.svm import SVC
+import pickle
 
 import matplotlib.pyplot as plt
 import seaborn as sn
@@ -14,36 +15,41 @@ from preprocessing import get_data, pca_transform
 
 
 def knn(X_train, X_test, y_train, y_test, k):
-    model = KNeighborsClassifier(n_neighbors=k)
+    model = KNeighborsClassifier(n_neighbors=k, probability=True)
     model.fit(X_train, y_train)
-    prdeictions = model.predict(X_test)
-    conf_matrix = confusion_matrix(y_test, prdeictions)
+    save_model(model,'knn')
+    predictions = model.predict(X_test)
+    conf_matrix = confusion_matrix(y_test, predictions)
     score(model, X_test, y_test)
 
 
 def random_forest(X_train, X_test, y_train, y_test):
-    model = RandomForestClassifier(n_estimators=100)
+    model = RandomForestClassifier(n_estimators=100, probability=True)
     model.fit(X_train, y_train)
-    prdeictions = model.predict(X_test)
-    conf_matrix = confusion_matrix(y_test, prdeictions)
+    save_model(model,'rf')
+    predictions = model.predict(X_test)
+    conf_matrix = confusion_matrix(y_test, predictions)
     score(model, X_test, y_test)
 
 
 def nn(X_train, X_test, y_train, y_test):
-    model = MLPClassifier(max_iter=500, hidden_layer_sizes=(200))
+    model = MLPClassifier(max_iter=500, hidden_layer_sizes=(200), probability=True)
     model.fit(X_train, y_train)
-    prdeictions = model.predict(X_test)
-    conf_matrix = confusion_matrix(y_test, prdeictions)
+    save_model(model,'nn')
+    predictions = model.predict(X_test)
+    conf_matrix = confusion_matrix(y_test, predictions)
     sco = score(model, X_test, y_test)
     return sco
 
 
 def svm(X_train, X_test, y_train, y_test):
-    model = SVC(gamma='auto')
+    model = SVC(gamma='auto', probability=True)
     model.fit(X_train, y_train)
-    prdeictions = model.predict(X_test)
-    conf_matrix = confusion_matrix(y_test, prdeictions)
+    save_model(model,'svm')
+    predictions = model.predict(X_test)
+    conf_matrix = confusion_matrix(y_test, predictions)
     score(model, X_test, y_test)
+
 
 
 def plot_confusion_matrix(conf_matrix, title):
@@ -71,11 +77,20 @@ def score(model, X_test, y_test):
     print("The total score was: {0}%".format(total_score))
     return total_score
 
+def save_model(model, classifier):
+    with open('./models/{}_model'.format(classifier), 'wb') as f:
+        pickle.dump(model,f)
+
+def load_model(classifier='svm'):
+    with open('./models/{}_model'.format(classifier),'rb') as f:
+        model = pickle.load(f)
+    return model
 
 def main():
 
     X_train, X_test, y_train, y_test = get_data(type_of_data='Default')
     score = svm(X_train, X_test, y_train, y_test)
-
+    #classifier = load_model()
+    #print(classifier.predict(X_test))
 
 main()

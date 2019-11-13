@@ -1,5 +1,3 @@
-
-
 import glob
 import random
 import string
@@ -12,6 +10,7 @@ import numpy as np
 import skimage as sk
 from skimage import transform
 from skimage import util
+import pickle
 
 
 # Allows you to load the data as 20x20 arrays
@@ -48,8 +47,12 @@ def get_data(type_of_data='Default'):
             data_features, data_labels)
 
         X_train = flatten_array_1D(X_train)
+        #print("original X_test")
+        #print(X_test)
         X_test = flatten_array_1D(X_test)
-        #X_train, X_test = pca_transform(X_train, X_test)
+        #print("X_test flatten")
+        #print(X_test)
+        X_train, X_test = pca_transform(X_train, X_test)
         return X_train, X_test, y_train, y_test
 
     elif type_of_data == "Untouched_test":
@@ -79,10 +82,22 @@ def pca_transform(X_train, X_test):
     all_observations = X_train + X_test
     pca = PCA(40)
     all_observations = pca.fit_transform(all_observations)
+    save_pca(pca)
+    # lagre pca til fil.
+    # bruk pca.transform(bilde)
+    # reshape to 400*1
     X_train = all_observations[0:len(X_train)]
     X_test = all_observations[-len(X_test):]
     return X_train, X_test
 
+def save_pca(pca):
+    with open('./models/pca', 'wb') as f:
+        pickle.dump(pca,f)
+
+def load_pca():
+    with open('./models/pca','rb') as f:
+        model = pickle.load(f)
+    return model
 
 def split_data(data_features, data_labels):
     X_train = []
