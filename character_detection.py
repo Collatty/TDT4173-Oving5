@@ -48,9 +48,9 @@ for (y,x, window) in sliding_window(image, stepSize=2, windowSize=windowSize):
               #print('(x,y)=({},{})'.format(x,y),pred)
               k = pred[0]
               if k in predicted:
-                     predicted[k].append([(x,y),pred])
+                     predicted[k].append([(x,y),pred,window])
               else:
-                     predicted[k] = [[(x,y),pred]]
+                     predicted[k] = [[(x,y),pred,window]]
               #plt.imshow(window,cmap="gray")
               #plt.show()
 
@@ -61,9 +61,9 @@ windows = {}
 for k,v in predicted.items():
        windows[k] = []
        if(len(v)==1):
-              windows[k] = v[0]
+              windows[k].append(v[0])
        else:
-              print(v)
+              #print(v)
               coordinates = []
               pred = []
               for l in v:
@@ -75,6 +75,7 @@ for k,v in predicted.items():
               for row in euclidean:
                      neighbours =[]
                      for i in range(len(row)):
+                            # 5 is the distance threshold
                             if(row[i] == 0) or (row[i] < 5):
                                    neighbours.append(i)
                      neighbour_list.append(neighbours)
@@ -98,5 +99,9 @@ for k,v in predicted.items():
               for i in window_indices:
                      windows[k].append(v[i])
 
-       print(windows)
+       #print(windows)
 
+for k,v in windows.items():
+       for w in v:
+              plt.imshow(w[-1],cmap="gray")
+              plt.show()
