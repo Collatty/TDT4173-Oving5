@@ -57,8 +57,12 @@ for (y,x, window) in sliding_window(image, stepSize=2, windowSize=windowSize):
 ## if two or more windows are close together (e.g. euclidean distance of 5), then chose the one with
 ## higher predicted probability
 
+windows = {}
 for k,v in predicted.items():
-       if(len(v)>1):
+       windows[k] = []
+       if(len(v)==1):
+              windows[k] = v[0]
+       else:
               print(v)
               coordinates = []
               pred = []
@@ -66,12 +70,9 @@ for k,v in predicted.items():
                      coordinates.append(l[0])
                      pred.append(l[1][1])
 
-              #print(coordinates)
               euclidean = euclidean_distances(coordinates)
-              #print(euclidean)
               neighbour_list = []
               for row in euclidean:
-                     #print(row)
                      neighbours =[]
                      for i in range(len(row)):
                             if(row[i] == 0) or (row[i] < 5):
@@ -80,7 +81,6 @@ for k,v in predicted.items():
 
               neighbour_list.sort()
               neighbour_list = list(neighbour_list for neighbour_list, _ in itertools.groupby(neighbour_list))
-              print(neighbour_list)
 
               #indeces of windows with highest predicted value of nearby windows
               window_indices = []
@@ -95,6 +95,8 @@ for k,v in predicted.items():
 
                      window_indices.append(max_i)
 
-              print(window_indices)
-#print(coordinates)
-#print(predicted)
+              for i in window_indices:
+                     windows[k].append(v[i])
+
+       print(windows)
+
