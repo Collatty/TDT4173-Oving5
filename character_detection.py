@@ -5,6 +5,7 @@ import cv2 as cv
 import itertools
 from sklearn.metrics.pairwise import euclidean_distances
 import matplotlib.pyplot as plt
+import string
 
 classifier = load_model()
 
@@ -27,7 +28,7 @@ def classify(image, threshold=0.8):
               return -1
 
 def load_image():
-       image = cv.imread('./detection-images/detection-1.jpg',0)
+       image = cv.imread('./detection-images/detection-1.jpg', 0)
        #image = cv.imread('./detection-images/detection-2.jpg', 0)
        pixels = np.divide(image, 255)
        return pixels
@@ -37,9 +38,10 @@ def sliding_window(image, stepSize, windowSize):
        for y in range(0, image.shape[0] - windowSize[0], 2*stepSize):
               for x in range(0, image.shape[1] - windowSize[1], stepSize):
                      # yield the current window
-                     yield (y, x, image[y:(y + windowSize[0]), x:(x + windowSize[0])])
+                     yield (y, x, image[y:(y + windowSize[0]), x:(x + windowSize[1])])
 
 image = load_image()
+temp = image
 windowSize = (20,20)
 predicted = {}
 for (y,x, window) in sliding_window(image, stepSize=2, windowSize=windowSize):
@@ -48,9 +50,9 @@ for (y,x, window) in sliding_window(image, stepSize=2, windowSize=windowSize):
               #print('(x,y)=({},{})'.format(x,y),pred)
               k = pred[0]
               if k in predicted:
-                     predicted[k].append([(x,y),pred,window])
+                     predicted[k].append([(y,x),pred,window])
               else:
-                     predicted[k] = [[(x,y),pred,window]]
+                     predicted[k] = [[(y,x),pred,window]]
               #plt.imshow(window,cmap="gray")
               #plt.show()
 
@@ -76,7 +78,7 @@ for k,v in predicted.items():
                      neighbours =[]
                      for i in range(len(row)):
                             # 5 is the distance threshold
-                            if(row[i] == 0) or (row[i] < 5):
+                            if(row[i] == 0) or (row[i] < 10):
                                    neighbours.append(i)
                      neighbour_list.append(neighbours)
 
@@ -103,5 +105,21 @@ for k,v in predicted.items():
 
 for k,v in windows.items():
        for w in v:
+              print(w[:-1])
               plt.imshow(w[-1],cmap="gray")
               plt.show()
+
+# draw window on image
+
+temp = cv.imread('./detection-images/detection-1.jpg',cv.IMREAD_COLOR)
+for k,v in windows.items():
+       for w in v:
+              y,x = w[0]
+              cv.rectangle(temp, (x, y), (x + windowSize[1], y + windowSize[0]), (0, 255, 0), 1) # draw rectangle on image
+              letter = string.ascii_lowercase[w[1][0]]
+              print(letter)
+              cv.putText(temp, letter, (x,y + 2*windowSize[0]), cv.FONT_HERSHEY_SIMPLEX,0.5, (0, 0, 0), 1)
+              plt.imshow(temp,cmap="gray", interpolation='nearest')
+              # show all windows
+plt.show()
+
