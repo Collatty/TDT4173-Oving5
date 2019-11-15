@@ -7,6 +7,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import confusion_matrix
 from sklearn.svm import SVC
 from sklearn.model_selection import cross_val_score
+import pickle
 
 import matplotlib.pyplot as plt
 import seaborn as sn
@@ -17,31 +18,36 @@ from preprocessing import get_data, pca_transform
 
 def knn(X_train, X_test, y_train, y_test, k):
     model = KNeighborsClassifier(n_neighbors=k)
+    save_model(model, 'knn')
     sco = new_score(model, X_train, X_test, y_train, y_test)
     return sco
 
 
 def random_forest(X_train, X_test, y_train, y_test):
-    model = RandomForestClassifier(n_estimators=100)
+    model = RandomForestClassifier(n_estimators=100, probability=True)
     model.fit(X_train, y_train)
-    prdeictions = model.predict(X_test)
-    conf_matrix = confusion_matrix(y_test, prdeictions)
+    save_model(model, 'rf')
+    predictions = model.predict(X_test)
+    conf_matrix = confusion_matrix(y_test, predictions)
     score(model, X_test, y_test)
 
 
 def nn(X_train, X_test, y_train, y_test):
-    model = MLPClassifier(max_iter=500, hidden_layer_sizes=(200))
+    model = MLPClassifier(
+        max_iter=500, hidden_layer_sizes=(200), probability=True)
     model.fit(X_train, y_train)
     #sco = new_score(model, X_train, X_test, y_train, y_test)
+    save_model(model, 'nn')
     sco = score(model, X_test, y_test)
     return sco
 
 
 def svm(X_train, X_test, y_train, y_test):
-    model = SVC(gamma='auto')
+    model = SVC(gamma='auto', probability=True)
     model.fit(X_train, y_train)
-    prdeictions = model.predict(X_test)
-    conf_matrix = confusion_matrix(y_test, prdeictions)
+    save_model(model, 'svm')
+    predictions = model.predict(X_test)
+    conf_matrix = confusion_matrix(y_test, predictions)
     score(model, X_test, y_test)
 
 
@@ -73,6 +79,17 @@ def score(model, X_test, y_test):
     total_score = round(model.score(X_test, y_test)*100, 2)
     print("The total score was: {0}%".format(total_score))
     return total_score
+
+
+def save_model(model, classifier):
+    with open('./models/{}_model'.format(classifier), 'wb') as f:
+        pickle.dump(model, f)
+
+
+def load_model(classifier='svm'):
+    with open('./models/{}_model'.format(classifier), 'rb') as f:
+        model = pickle.load(f)
+    return model
 
 
 def new_score(model, X_train, X_test, y_train, y_test):
