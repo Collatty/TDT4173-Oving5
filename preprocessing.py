@@ -38,7 +38,7 @@ def load_data():
     return data_features, data_labels
 
 
-def get_data(type_of_data='Default'):
+def get_data(type_of_data='Default', pca=True):
     data_features, data_labels = load_data()
 
     if type_of_data == 'Default':
@@ -49,7 +49,8 @@ def get_data(type_of_data='Default'):
 
         X_train = flatten_array_1D(X_train)
         X_test = flatten_array_1D(X_test)
-        #X_train, X_test = pca_transform(X_train, X_test)
+        if pca:
+            X_train, X_test = pca_transform(X_train, X_test)
         return X_train, X_test, y_train, y_test
 
     elif type_of_data == "Untouched_test":

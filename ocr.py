@@ -6,19 +6,19 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import confusion_matrix
 from sklearn.svm import SVC
+from sklearn.model_selection import cross_val_score
 
 import matplotlib.pyplot as plt
 import seaborn as sn
+import numpy as np
 
 from preprocessing import get_data, pca_transform
 
 
 def knn(X_train, X_test, y_train, y_test, k):
     model = KNeighborsClassifier(n_neighbors=k)
-    model.fit(X_train, y_train)
-    prdeictions = model.predict(X_test)
-    conf_matrix = confusion_matrix(y_test, prdeictions)
-    score(model, X_test, y_test)
+    sco = new_score(model, X_train, X_test, y_train, y_test)
+    return sco
 
 
 def random_forest(X_train, X_test, y_train, y_test):
@@ -32,8 +32,7 @@ def random_forest(X_train, X_test, y_train, y_test):
 def nn(X_train, X_test, y_train, y_test):
     model = MLPClassifier(max_iter=500, hidden_layer_sizes=(200))
     model.fit(X_train, y_train)
-    prdeictions = model.predict(X_test)
-    conf_matrix = confusion_matrix(y_test, prdeictions)
+    #sco = new_score(model, X_train, X_test, y_train, y_test)
     sco = score(model, X_test, y_test)
     return sco
 
@@ -62,6 +61,10 @@ def score(model, X_test, y_test):
             scores[y_test[i]] = [0, 0]
         if predictions[i] == y_test[i]:
             scores[y_test[i]][0] += 1
+        # if predictions[i] != y_test[i]:
+            # if y_test[i] == 25:
+            #     print_photo(X_test[i])
+            #     print(string.ascii_lowercase[predictions[i]])
         scores[y_test[i]][1] += 1
     for key, value in scores.items():
         output = "The score for {0} was {1}%".format(
@@ -72,10 +75,47 @@ def score(model, X_test, y_test):
     return total_score
 
 
-def main():
+def new_score(model, X_train, X_test, y_train, y_test):
+    data_features = np.concatenate((X_train, X_test))
+    data_labels = np.concatenate((y_train, y_test))
 
-    X_train, X_test, y_train, y_test = get_data(type_of_data='Default')
-    score = svm(X_train, X_test, y_train, y_test)
+    score = cross_val_score(model, data_features, data_labels, cv=5)
+    return score
+
+
+def plot_score_PCA(accuracy_with_pca, accuracy_no_pca, title):
+    #average_with_pca = sum(accuracy_with_pca)/len(accuracy_with_pca)
+    #average_no_pca = sum(accuracy_no_pca)/len(accuracy_no_pca)
+    plt.title(title)
+    plt.ylabel('Accuracy percentage')
+    plt.plot(accuracy_with_pca)
+    plt.plot(accuracy_no_pca)
+    # plt.plot(average_with_pca, linestyle='-.')
+    # plt.plot(average_no_pca, linestyle='-.')
+    plt.legend(['With PCA', 'No PCA'])
+    plt.gca().set_yticklabels(['{:,.2f}%'.format(x)
+                               for x in plt.gca().get_yticks()])
+    plt.show()
+
+
+def plot_score_hidden_layers_size(scores, number_in_hidden):
+    plt.ylabel('Accuracy percentage')
+    plt.plot(number_in_hidden, scores)
+    plt.gca().set_yticklabels(['{:,.2f}%'.format(x)
+                               for x in plt.gca().get_yticks()])
+    plt.show()
+
+
+def print_photo(array):
+    array = np.reshape(array, (20, 20))
+    plt.imshow(array, cmap='gray')
+    plt.show()
+
+
+def main():
+    X_train, X_test, y_train, y_test = get_data(
+        type_of_data='Default', pca=False)
+    score = nn(X_train, X_test, y_train, y_test)
 
 
 main()
