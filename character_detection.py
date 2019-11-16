@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+
 import pickle
 import itertools
 import string
