@@ -137,9 +137,9 @@ def remove_duplicates(final_windows):
 def main():
     classifier = pickle.load(open('./models/nn_model', 'rb'))
     pca = pickle.load(open('./models/pca', 'rb'))
-    image = load_image('./detection-images/detection-1.jpg')
+    image = load_image('./detection-images/detection-2.jpg')
     window_size = (20, 20)
-    temp = cv.imread('./detection-images/detection-1.jpg', cv.IMREAD_COLOR)
+    temp = cv.imread('./detection-images/detection-2.jpg', cv.IMREAD_COLOR)
     # temp = cv.imread('./detection-images/detection-1.jpg', cv.IMREAD_COLOR)
     predicted = classify_best_windows(
         image, classifier, pca, step_size=1, window_size=(20, 20))
@@ -154,7 +154,7 @@ def main():
         cv.rectangle(
             temp, (x, y), (x + window_size[1], y + window_size[0]), (0, 255, 0), 1)
         letter = string.ascii_lowercase[k[1]]
-        print(letter)
+        #print(letter)
         cv.putText(temp, letter, (x, y + 2 *
                                   window_size[0]), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
         plt.imshow(temp, cmap="gray", interpolation='nearest')
