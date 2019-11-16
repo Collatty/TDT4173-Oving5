@@ -2,3 +2,5 @@ __pychace__/
 .vscode
 __pycache__
 __pycache__/preprocessing.cpython-37.pyc
+test.py
+.idea
