@@ -34,7 +34,7 @@ def random_forest(X_train, X_test, y_train, y_test):
 
 def nn(X_train, X_test, y_train, y_test):
     model = MLPClassifier(
-        max_iter=500, hidden_layer_sizes=(200), probability=True)
+        max_iter=500, hidden_layer_sizes=(850))
     model.fit(X_train, y_train)
     #sco = new_score(model, X_train, X_test, y_train, y_test)
     save_model(model, 'nn')
@@ -86,7 +86,7 @@ def save_model(model, classifier):
         pickle.dump(model, f)
 
 
-def load_model(classifier='svm'):
+def load_model(classifier='nn'):
     with open('./models/{}_model'.format(classifier), 'rb') as f:
         model = pickle.load(f)
     return model
@@ -131,8 +131,9 @@ def print_photo(array):
 
 def main():
     X_train, X_test, y_train, y_test = get_data(
-        type_of_data='Default', pca=False)
+        type_of_data='Default')
     score = nn(X_train, X_test, y_train, y_test)
+    print(score)
 
 
 main()

@@ -1,6 +1,7 @@
 import glob
 import random
 import string
+import pickle
 from PIL import Image
 from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA
@@ -10,7 +11,6 @@ import numpy as np
 import skimage as sk
 from skimage import transform
 from skimage import util
-import pickle
 
 
 # Allows you to load the data as 20x20 arrays
