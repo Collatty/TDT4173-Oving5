@@ -2,11 +2,12 @@ import cv2 as cv
 import matplotlib.pyplot as plt
 import random
 import skimage as sk
+import pickle
 from skimage import util, transform
 
 image = cv.imread('./chars74k-lite/b/b_8.jpg')
-plt.imshow(image, cmap="gray")
-plt.show()
+#plt.imshow(image, cmap="gray")
+# plt.show()
 
 
 def random_rotation(image_array):
@@ -26,5 +27,8 @@ def horizontal_flip(image_array):
 
 
 image = horizontal_flip(image)
-plt.imshow(image, cmap="gray")
-plt.show()
+#plt.imshow(image, cmap="gray")
+# plt.show()
+
+model = pickle.load(open('./models/nn_model', 'rb'))
+print(model)

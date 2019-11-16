@@ -23,7 +23,7 @@ def load_data():
         labels_for_character = []
         for image in glob.iglob('./chars74k-lite/'+character+'/*.jpg'):
             image = cv.imread(image, 0)
-            #thresh, image = cv.threshold(image, 127, 255, cv.THRESH_BINARY)
+            # thresh, image = cv.threshold(image, 127, 255, cv.THRESH_BINARY) Some data augmentation was attempted here.
             # image = cv.fastNlMeansDenoising(
             # image, templateWindowSize=7, searchWindowSize=3)
             pixels = np.array(image)
@@ -47,8 +47,6 @@ def get_data(type_of_data='Default', pca=True):
             data_features, data_labels)
 
         X_train = flatten_array_1D(X_train)
-        #print("original X_test")
-        # print(X_test)
         X_test = flatten_array_1D(X_test)
         if pca:
             X_train, X_test = pca_transform(X_train, X_test)
@@ -76,15 +74,12 @@ def get_data(type_of_data='Default', pca=True):
         return X_train, X_test, y_train, y_test
 
 
-# Reduce number of features to 100
+# Reduce number of features to 40
 def pca_transform(X_train, X_test):
     all_observations = X_train + X_test
     pca = PCA(40)
     all_observations = pca.fit_transform(all_observations)
     save_pca(pca)
-    # lagre pca til fil.
-    # bruk pca.transform(bilde)
-    # reshape to 400*1
     X_train = all_observations[0:len(X_train)]
     X_test = all_observations[-len(X_test):]
     return X_train, X_test
